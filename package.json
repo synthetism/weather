@@ -1,7 +1,7 @@
 {
-  "name": "@synet/ai",
+  "name": "@synet/weather",
   "version": "1.0.0",
-  "description": "Zero-dependency, secure, multi-provider AI unit following Unit Architecture principles. Supports OpenAI, Anthropic, Claude, Gemini, and Deepseek.",
+  "description": "Weather forecast API following Unit Architecture principles.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
@@ -52,15 +52,8 @@
     "registry": "https://registry.npmjs.org/"
   },
   "keywords": [
-    "ai",
-    "Open AI",
-    "Anthropic",
-    "Claude",
-    "Gemini",
-    "Deepseek",
-    "serverless",
-    "unit-architecture",
-    "synthetism"
+    "Weather forcast API",
+    "Synet"
   ],
   "author": "Synet Team",
   "homepage": "https://synthetism.ai",
@@ -70,6 +63,6 @@
     "node": ">=18.0.0"
   },
   "dependencies": {
-    "@synet/unit": "^1.0.6-dev.3"
+    "@synet/unit": "^1.0.8"
   }
 }
