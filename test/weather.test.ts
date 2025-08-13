@@ -52,11 +52,7 @@ class MockWeatherProvider implements IWeather {
     return this.getCurrentWeather();
   }
 
-  async searchLocation() {
-    return [
-      { name: 'Test City', country: 'TC', lat: 0, lon: 0 }
-    ];
-  }
+
 
   async validateConnection() {
     return true;
@@ -79,7 +75,6 @@ describe('Weather Unit', () => {
     it('should create with valid configuration', () => {
       expect(weather).toBeDefined();
       expect(weather.dna.id).toBe('weather');
-      expect(weather.dna.version).toBe('1.0.0');
     });
 
     it('should implement Unit Architecture methods', () => {
@@ -108,7 +103,7 @@ describe('Weather Unit', () => {
       expect(weather.can('getCurrentWeather')).toBe(true);
       expect(weather.can('getForecast')).toBe(true);
       expect(weather.can('getWeatherByCoords')).toBe(true);
-      expect(weather.can('searchLocation')).toBe(true);
+
     });
 
     it('should have schemas for all capabilities', () => {
@@ -116,7 +111,7 @@ describe('Weather Unit', () => {
       expect(schema.has('getCurrentWeather')).toBe(true);
       expect(schema.has('getForecast')).toBe(true);
       expect(schema.has('getWeatherByCoords')).toBe(true);
-      expect(schema.has('searchLocation')).toBe(true);
+   
     });
   });
 
@@ -138,11 +133,7 @@ describe('Weather Unit', () => {
       expect(result).toHaveProperty('location', 'Test City');
     });
 
-    it('should delegate searchLocation to provider', async () => {
-      const result = await weather.searchLocation('London');
-      expect(result).toHaveLength(1);
-      expect(result[0]).toHaveProperty('name', 'Test City');
-    });
+
 
     it('should delegate validateConnection to provider', async () => {
       const result = await weather.validateConnection();

@@ -77,11 +77,6 @@ export interface IWeather {
   getWeatherByCoords(lat: number, lon: number, units?: 'metric' | 'imperial' | 'kelvin'): Promise<WeatherData>;
 
   /**
-   * Search for location coordinates by name
-   */
-  searchLocation(query: string): Promise<LocationResult[]>;
-
-  /**
    * Validate provider connection and configuration
    */
   validateConnection(): Promise<boolean>;

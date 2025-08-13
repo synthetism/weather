@@ -55,6 +55,7 @@ export interface WeatherProps extends UnitProps {
 // WEATHER UNIT IMPLEMENTATION
 // =============================================================================
 
+export const VERSION = '1.0.1';
 /**
  * Weather Unit - AI-Ready Weather Information Provider
  * 
@@ -66,10 +67,6 @@ export class Weather extends Unit<WeatherProps> {
   protected constructor(props: WeatherProps) {
     super(props);
   }
-
-  // =============================================================================
-  // CONSCIOUSNESS TRINITY - v1.0.8
-  // =============================================================================
 
   /**
    * Build consciousness trinity - creates living instances once
@@ -87,10 +84,6 @@ export class Weather extends Unit<WeatherProps> {
       getWeatherByCoords: (...args: unknown[]) => {
         const params = args[0] as { latitude: number; longitude: number; units?: 'metric' | 'imperial' | 'kelvin' };
         return this.getWeatherByCoords(params.latitude, params.longitude, params.units);
-      },
-      searchLocation: (...args: unknown[]) => {
-        const params = args[0] as { query: string };
-        return this.searchLocation(params.query);
       }
     });
 
@@ -182,30 +175,7 @@ export class Weather extends Unit<WeatherProps> {
             temperature: { type: 'number', description: 'Temperature value' } 
           } 
         }
-      },
-      searchLocation: {
-        name: 'searchLocation',
-        description: 'Search for location coordinates by name',
-        parameters: {
-          type: 'object',
-          properties: {
-            query: {
-              type: 'string',
-              description: 'Location search query'
-            }
-          },
-          required: ['query']
-        },
-        response: { 
-          type: 'array', 
-          properties: { 
-            name: { type: 'string', description: 'Location name' }, 
-            lat: { type: 'number', description: 'Latitude' },
-            lon: { type: 'number', description: 'Longitude' },
-            country: { type: 'string', description: 'Country code' }
-          } 
-        }
-      }
+      },     
     });
 
     const validator = ValidatorClass.create({
@@ -251,7 +221,7 @@ export class Weather extends Unit<WeatherProps> {
     const props: WeatherProps = {
       dna: createUnitSchema({
         id: 'weather',
-        version: '1.0.0'
+        version: VERSION
       }),
       created: new Date(),
       metadata: config.metadata || {},
@@ -328,13 +298,6 @@ Provider Integration:
    */
   async getWeatherByCoords(lat: number, lon: number, units?: 'metric' | 'imperial' | 'kelvin'): Promise<WeatherData> {
     return this.props.provider.getWeatherByCoords(lat, lon, units || this.props.defaultUnits);
-  }
-
-  /**
-   * Search for location coordinates
-   */
-  async searchLocation(query: string): Promise<LocationResult[]> {
-    return this.props.provider.searchLocation(query);
   }
 
   /**

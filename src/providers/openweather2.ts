@@ -175,31 +175,6 @@ export class OpenWeather2 implements IWeather {
     }
   }
 
-  async searchLocation(query: string): Promise<LocationResult[]> {
-    if (!query || typeof query !== 'string') {
-      throw new Error('[OpenWeather2] Search query is required');
-    }
-
-    try {
-      const url = `http://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(query)}&limit=5&appid=${this.apiKey}`;
-      
-      const response = await this.makeRequest(url);
-      const data = await response.json() as GeocodingResponse[];
-      
-      return data.map((item) => ({
-        name: item.name,
-        country: item.country,
-        lat: item.lat,
-        lon: item.lon
-      }));
-    } catch (error) {
-      if (error instanceof Error) {
-        throw error;
-      }
-      throw new Error(`[OpenWeather2] Failed to search location: ${error}`);
-    }
-  }
-
   async validateConnection(): Promise<boolean> {
     try {
       // Test with a simple weather query for London
@@ -229,10 +204,10 @@ export class OpenWeather2 implements IWeather {
 
       if (!response.ok) {
         if (response.status === 404) {
-          throw new Error(`[OpenWeather2] Location not found`);
+          throw new Error('[OpenWeather2] Location not found');
         }
         if (response.status === 401) {
-          throw new Error(`[OpenWeather2] Invalid API key`);
+          throw new Error('[OpenWeather2] Invalid API key');
         }
         throw new Error(`[OpenWeather2] API error: ${response.status}`);
       }

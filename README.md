@@ -9,7 +9,7 @@
    \ \____________\ \_______\ \__\ \__\   \ \__\ \ \__\ \__\ \_______\ \__\\ _\ 
     \|____________|\|_______|\|__|\|__|    \|__|  \|__|\|__|\|_______|\|__|\|__|
                                                                                 
-version: 1.0.0                                                                 
+version: 1.0.1                                                                 
 ```
 
 **Weather intelligence provider for AI systems with configurable provider architecture**
@@ -74,7 +74,6 @@ interface IWeather {
   getCurrentWeather(location: string, units?: string): Promise<WeatherData>;
   getForecast(lat: number, lon: number, units?: string): Promise<ForecastData>;
   getWeatherByCoords(lat: number, lon: number, units?: string): Promise<WeatherData>;
-  searchLocation(query: string): Promise<LocationResult[]>;
   validateConnection(): Promise<boolean>;
 }
 
@@ -120,7 +119,6 @@ Weather.create(config: WeatherConfig): Weather
 getCurrentWeather(location: string, units?: string): Promise<WeatherData>
 getForecast(lat: number, lon: number, units?: string): Promise<ForecastData>  
 getWeatherByCoords(lat: number, lon: number, units?: string): Promise<WeatherData>
-searchLocation(query: string): Promise<LocationResult[]>
 
 // Unit Architecture methods
 teach(): TeachingContract

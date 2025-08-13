@@ -25,7 +25,7 @@ describe('OpenWeather2 Provider', () => {
       expect(provider).toHaveProperty('getCurrentWeather');
       expect(provider).toHaveProperty('getForecast');
       expect(provider).toHaveProperty('getWeatherByCoords');
-      expect(provider).toHaveProperty('searchLocation');
+
       expect(provider).toHaveProperty('validateConnection');
     });
 
@@ -39,7 +39,7 @@ describe('OpenWeather2 Provider', () => {
       expect(typeof provider.getCurrentWeather).toBe('function');
       expect(typeof provider.getForecast).toBe('function');
       expect(typeof provider.getWeatherByCoords).toBe('function');
-      expect(typeof provider.searchLocation).toBe('function');
+   
       expect(typeof provider.validateConnection).toBe('function');
     });
   });
@@ -62,9 +62,7 @@ describe('OpenWeather2 Provider', () => {
       await expect(provider.getWeatherByCoords(0, 181)).rejects.toThrow(/invalid.*coordinates/i);
     });
 
-    it('should validate searchLocation parameters', async () => {
-      await expect(provider.searchLocation('')).rejects.toThrow(/query.*required/i);
-    });
+
   });
 
   describe('Error Handling', () => {
