@@ -1,7 +1,7 @@
 /**
  * WEATHER UNIT - AI-Ready Weather Information Provider
  * 
- * Professional weather data integration for AI systems using Unit Architecture.
+ * Weather data integration for AI systems using Unit Architecture.
  * Provides seamless weather capabilities through configurable providers.
  * 
  * @example
@@ -27,7 +27,8 @@ import {
   type UnitCore,
   type Capabilities,
   type Schema,
-  type Validator 
+  type Validator,
+  type Event
 } from '@synet/unit';
 import { 
   Capabilities as CapabilitiesClass, 
@@ -41,6 +42,17 @@ import type {
   LocationResult, 
   WeatherConfig 
 } from './types.js';
+
+// =============================================================================
+// WEATHER EVENT INTERFACES
+// =============================================================================
+
+interface WeatherEvent extends Event {
+  type: 'weather.current' | 'weather.forecast' | 'weather.coords';
+  unitId: string;
+  operation: string;
+  data: Record<string, unknown>;
+}
 
 // =============================================================================
 // WEATHER UNIT INTERFACES
@@ -209,10 +221,6 @@ export class Weather extends Unit<WeatherProps> {
     return this._unit.validator;
   }
 
-  // =============================================================================
-  // UNIT CREATION AND MANAGEMENT
-  // =============================================================================
-
   static create(config: WeatherConfig): Weather {
     if (!config.provider) {
       throw new Error('[Weather] Provider is required');
@@ -244,7 +252,6 @@ Native Capabilities:
 • getCurrentWeather(location) - Get current weather for a location
 • getForecast(lat, lon) - Get weather forecast using coordinates
 • getWeatherByCoords(lat, lon) - Get weather by coordinates
-• searchLocation(query) - Search for location coordinates
 
 Configuration:
 • Provider: ${this.props.provider.constructor.name}
@@ -263,6 +270,16 @@ AI Integration:
 Provider Integration:
   const provider = new OpenWeather2({ apiKey: "your-key" });
   const weather = Weather.create({ provider });
+
+Events:
+  
+ interface WeatherEvent  {
+  type: 'weather.current' | 'weather.forecast' | 'weather.coords';
+  unitId: string;
+  operation: string;
+  data: Record<string, unknown>;
+ }
+
 `);
   }
 
@@ -276,28 +293,161 @@ Provider Integration:
   }
 
   // =============================================================================
-  // WEATHER OPERATIONS (Delegate to Provider)
+  // WEATHER OPERATIONS (Delegate to Provider with Event Consciousness)
   // =============================================================================
 
   /**
    * Get current weather for a location
    */
   async getCurrentWeather(location: string, units?: 'metric' | 'imperial' | 'kelvin'): Promise<WeatherData> {
-    return this.props.provider.getCurrentWeather(location, units || this.props.defaultUnits);
+    const startTime = Date.now();
+    const actualUnits = units || this.props.defaultUnits;
+    
+    try {
+      const result = await this.props.provider.getCurrentWeather(location, actualUnits);
+      const duration = Date.now() - startTime;
+
+      // Emit success event with result
+      this.emit({
+        type: 'weather.current',
+        timestamp: new Date(),
+        unitId: this.dna.id,
+        operation: 'getCurrentWeather',
+        data: { 
+          location, 
+          units: actualUnits, 
+          duration,
+          temperature: result.temperature,
+          humidity: result.humidity,
+          pressure: result.pressure,
+          description: result.description,
+          icon: result.icon,
+          windSpeed: result.windSpeed,
+          windDirection: result.windDirection,
+          visibility: result.visibility
+        }
+      } as WeatherEvent);
+
+      return result;
+    } catch (error) {
+      const duration = Date.now() - startTime;
+      
+      // Emit error event
+      this.emit({
+        type: 'weather.current',
+        timestamp: new Date(),
+        unitId: this.dna.id,
+        operation: 'getCurrentWeather',
+        data: { location, units: actualUnits, duration },
+        error: {
+          message: error instanceof Error ? error.message : String(error)
+        }
+      } as WeatherEvent);
+
+      throw error;
+    }
   }
 
   /**
    * Get weather forecast for coordinates
    */
   async getForecast(lat: number, lon: number, units?: 'metric' | 'imperial' | 'kelvin'): Promise<ForecastData> {
-    return this.props.provider.getForecast(lat, lon, units || this.props.defaultUnits);
+    const startTime = Date.now();
+    const actualUnits = units || this.props.defaultUnits;
+    
+    try {
+      const result = await this.props.provider.getForecast(lat, lon, actualUnits);
+      const duration = Date.now() - startTime;
+
+      // Emit success event with result
+      this.emit({
+        type: 'weather.forecast',
+        timestamp: new Date(),
+        unitId: this.dna.id,
+        operation: 'getForecast',
+        data: { 
+          latitude: lat, 
+          longitude: lon, 
+          units: actualUnits, 
+          location: result.location,
+          country: result.country,
+          forecastCount: result.forecasts.length
+        }
+      } as WeatherEvent);
+
+      return result;
+    } catch (error) {
+      const duration = Date.now() - startTime;
+      
+      // Emit error event
+      this.emit({
+        type: 'weather.forecast',
+        timestamp: new Date(),
+        unitId: this.dna.id,
+        operation: 'getForecast',
+        data: { latitude: lat, longitude: lon, units: actualUnits, duration },
+        error: {
+          message: error instanceof Error ? error.message : String(error)
+        }
+      } as WeatherEvent);
+
+      throw error;
+    }
   }
 
   /**
    * Get weather by coordinates
    */
   async getWeatherByCoords(lat: number, lon: number, units?: 'metric' | 'imperial' | 'kelvin'): Promise<WeatherData> {
-    return this.props.provider.getWeatherByCoords(lat, lon, units || this.props.defaultUnits);
+    const startTime = Date.now();
+    const actualUnits = units || this.props.defaultUnits;
+    
+    try {
+      // Emit request event
+  
+      const result = await this.props.provider.getWeatherByCoords(lat, lon, actualUnits);
+      const duration = Date.now() - startTime;
+
+      // Emit success event
+      this.emit({
+        type: 'weather.coords',
+        timestamp: new Date(),
+        unitId: this.dna.id,
+        operation: 'getWeatherByCoords',
+        data: { 
+          latitude: lat, 
+          longitude: lon, 
+          units: actualUnits, 
+          duration,
+          temperature: result.temperature,
+          humidity: result.humidity,
+          pressure: result.pressure,
+          description: result.description,
+          icon: result.icon,
+          windSpeed: result.windSpeed,
+          windDirection: result.windDirection,
+          visibility: result.visibility
+        }
+      } as WeatherEvent);
+
+      return result;
+    } catch (error) {
+      const duration = Date.now() - startTime;
+      
+      // Emit error event
+      this.emit({
+        type: 'weather.coords',
+        timestamp: new Date(),
+        unitId: this.dna.id,
+        operation: 'getWeatherByCoords',
+        data: { latitude: lat, longitude: lon, units: actualUnits, duration },
+        error: {
+          message: error instanceof Error ? error.message : String(error)
+        }
+      } as WeatherEvent);
+
+      throw error;
+    }
   }
 
   /**

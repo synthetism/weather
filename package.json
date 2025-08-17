@@ -1,6 +1,6 @@
 {
   "name": "@synet/weather",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Weather forecast API following Unit Architecture principles.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -63,6 +63,6 @@
     "node": ">=18.0.0"
   },
   "dependencies": {
-    "@synet/unit": "^1.0.8"
+    "@synet/unit": "^1.0.9"
   }
 }

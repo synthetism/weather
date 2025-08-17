@@ -1,75 +1,91 @@
-# Weather Intelligence Provider
+# @synet/weather
 
 ```bash
- ___       ___  _______   ________  _________  ___  ___  _______   ________     
-|\  \     |\  \|\  ___ \ |\   __  \|\___   ___\\  \|\  \|\  ___ \ |\   __  \    
-\ \  \    \ \  \ \   __/|\ \  \|\  \|___ \  \_\ \  \\\  \ \   __/|\ \  \|\  \   
- \ \  \  __\ \  \ \  \_|/_\ \   __  \   \ \  \ \ \   __  \ \  \_|/_\ \   _  _\  
-  \ \  \|\__\_\  \ \  \_|\ \ \  \ \  \   \ \  \ \ \  \ \  \ \  \_|\ \ \  \\  \| 
-   \ \____________\ \_______\ \__\ \__\   \ \__\ \ \__\ \__\ \_______\ \__\\ _\ 
-    \|____________|\|_______|\|__|\|__|    \|__|  \|__|\|__|\|_______|\|__|\|__|
-                                                                                
-version: 1.0.1                                                                 
+ _       __           __  __             
+| |     / /__  ____ _/ /_/ /_  ___  _____
+| | /| / / _ \/ __ `/ __/ __ \/ _ \/ ___/
+| |/ |/ /  __/ /_/ / /_/ / / /  __/ /    
+|__/|__/\___/\__,_/\______/_/\___/_/     
+         / / / /___  (_) /_              
+        / / / / __ \/ / __/              
+       / /_/ / / / / / /_                
+       \____/_/ /_/_/\__/                
+                                            
+version: 1.0.2                                                                 
 ```
 
-**Weather intelligence provider for AI systems with configurable provider architecture**
+**Weather data for AI systems. Multiple providers. Built on Unit Architecture.**
 
-## Executive Summary
+## What This Is
 
-Weather Intelligence delivers production-ready weather data integration for AI applications through a clean, provider-agnostic interface. Built on Unit Architecture principles, it enables seamless AI capability composition while maintaining enterprise reliability standards.
+Get weather data. Support multiple providers. Switch providers without changing code. Built for AI systems that need weather capabilities.
 
-## Core Value Proposition
-
-- **Universal Provider Interface** - Switch between weather services without code changes
-- **AI-Native Integration** - Purpose-built for AI agent capability acquisition
-- **Enterprise Reliability** - Production-tested error handling and connection management
-- **Zero Lock-in Architecture** - Provider abstraction prevents vendor dependency
-- **Type-Safe Operations** - Full TypeScript support with comprehensive interface definitions
+No vendor lock-in. No configuration hell. Just weather data when you need it.
 
 ## Supported Providers
 
-| Provider | Status | Coverage | API Version | Cost Efficiency |
-|----------|--------|----------|-------------|-----------------|
-| **OpenWeather2** |  Production | Global | 2.5 | Excellent |
-| **WeatherAPI** |  Roadmap | Global | v1 | Good |
-| **AccuWeather** | Roadmap | Global | v1 | Premium |
+| Provider | Status | API Version |
+|----------|--------|-------------|
+| **OpenWeather2** | ✅ Production | 2.5 |
+| **WeatherAPI** | 🔄 Planned | v1 |
+| **AccuWeather** | 🔄 Planned | v1 |
 
 ## Quick Start
 
 ```typescript
 import { OpenWeather2, Weather } from '@synet/weather';
-import { AI } from '@synet/ai';
 
-// Initialize weather provider
+// Set up provider
 const provider = new OpenWeather2({ 
   apiKey: process.env.OPENWEATHER_API_KEY 
 });
 
-// Create weather intelligence unit
+// Create weather unit
 const weather = Weather.create({ 
   provider,
   defaultUnits: 'metric'
 });
 
-// Enable AI weather capabilities
-const ai = AI.create({ type: 'openai', options: { apiKey: 'sk-...' } });
-ai.learn([weather.teach()]);
+// Get weather data
+const current = await weather.getCurrentWeather('Tokyo');
+const forecast = await weather.getForecast(35.6762, 139.6503);
+const coords = await weather.getWeatherByCoords(35.6762, 139.6503);
 
-// AI now has weather intelligence
-const response = await ai.call(
-  "Create a weather report for London, Paris, and Tokyo with recommendations",
-  { useTools: true }
-);
+// For AI systems
+const ai = AI.create({ type: 'openai' });
+ai.learn([weather.teach()]);
+await ai.call("What's the weather in Paris?", { useTools: true });
 ```
 
-## Architecture Overview
+## Events
 
-### Provider Pattern Implementation
-
-Weather Intelligence Provider implements the Strategy pattern for maximum flexibility:
+Weather operations emit events for monitoring, debugging, and AI integration:
 
 ```typescript
-// Universal interface - all providers implement this
+// Listen to weather events
+weather.on('weather.current', (event) => {
+  
+  if(event.error)
+    console.log(`Weather failed: ${event.error.message}`);  
+  else
+     console.log(`Got weather for ${event.data.location} in ${event.data.duration}ms`);
+  
+});
+
+// Available event types:
+// weather.current
+// weather.forecast 
+// weather.coords
+```
+
+## How It Works
+
+### Provider Pattern
+
+All weather providers implement the same interface. Switch providers without changing your code:
+
+```typescript
+// Universal interface
 interface IWeather {
   getCurrentWeather(location: string, units?: string): Promise<WeatherData>;
   getForecast(lat: number, lon: number, units?: string): Promise<ForecastData>;
@@ -77,73 +93,57 @@ interface IWeather {
   validateConnection(): Promise<boolean>;
 }
 
-// Provider implementations
-const openWeather = new OpenWeather2({ apiKey: 'your-key' });
-const weatherAPI = new WeatherAPI({ apiKey: 'your-key' }); // Future provider
+// Different providers, same interface
+const openWeather = new OpenWeather2({ apiKey: 'key1' });
+const weatherAPI = new WeatherAPI({ apiKey: 'key2' });
 
-// Seamless provider switching
+// Seamless switching
 const weather1 = Weather.create({ provider: openWeather });
 const weather2 = Weather.create({ provider: weatherAPI });
 ```
 
-### Unit Architecture Integration
+### Unit Architecture
 
-Built on Unit Architecture for seamless AI capability composition:
+The weather unit can teach its capabilities to AI systems:
 
 ```typescript
-// Weather unit exposes capabilities through Unit Architecture
-const capabilities = weather.capabilities(); // Runtime capability access
-const schema = weather.schema();             // API documentation
-const validator = weather.validator();       // Type validation
-
-// Teaching contract for AI learning
-const contract = weather.teach();
-ai.learn([contract]);
-
-// AI can now execute weather operations
-await ai.execute('weather.getCurrentWeather', { location: 'Tokyo' });
+// Weather unit methods
+weather.getCurrentWeather('Tokyo')     // Direct usage
+weather.teach()                        // Share capabilities with AI
+weather.capabilities()                 // List available methods
+weather.on('weather.current', handler) // Monitor operations
 ```
 
 ## API Reference
 
 ### Weather Unit
 
-#### Constructor
 ```typescript
+// Create weather unit
 Weather.create(config: WeatherConfig): Weather
-```
 
-#### Core Methods
-```typescript
-// Weather operations
+// Get weather data
 getCurrentWeather(location: string, units?: string): Promise<WeatherData>
 getForecast(lat: number, lon: number, units?: string): Promise<ForecastData>  
 getWeatherByCoords(lat: number, lon: number, units?: string): Promise<WeatherData>
 
 // Unit Architecture methods
-teach(): TeachingContract
-capabilities(): Capabilities
-schema(): Schema
-validator(): Validator
+teach(): TeachingContract        // Share capabilities with AI
+capabilities(): Capabilities     // List methods
+on(event, handler): () => void   // Listen to events
 ```
 
 ### OpenWeather2 Provider
 
-#### Constructor
 ```typescript
-new OpenWeather2(config: OpenWeather2Config)
+new OpenWeather2({
+  apiKey: string,
+  timeout?: number,      // Request timeout (default: 5000ms)
+  baseUrl?: string       // Custom API endpoint
+})
 ```
 
-#### Configuration
-```typescript
-interface OpenWeather2Config {
-  apiKey: string;
-  timeout?: number;      // Request timeout (default: 5000ms)
-  baseUrl?: string;      // Custom API endpoint
-}
-```
-
-## Data Models
+## Data Types
 
 ### WeatherData
 ```typescript
@@ -183,114 +183,82 @@ interface ForecastData {
 }
 ```
 
-## Enterprise Features
+## Examples
 
-### Error Handling
-- **Comprehensive Logging** - Detailed error tracking for debugging
-- **Connection Validation** - Pre-flight checks for API connectivity
-- **Timeout Management** - Configurable request timeouts
-
-### Performance Optimization
-- **Efficient API Usage** - Minimizes unnecessary API calls
-- **Response Caching** - Optional caching layer for repeated requests
-- **Connection Pooling** - Optimized HTTP connection management
-- **Rate Limiting** - Built-in rate limit compliance
-
-### Security
-- **API Key Protection** - Secure credential management
-- **Request Validation** - Input sanitization and validation
-- **Error Sanitization** - No sensitive data in error messages
-
-## Development Workflow
-
-### Installation
-```bash
-npm install @synet/weather
-# or
-pnpm add @synet/weather
-```
-
-### Environment Setup
-```bash
-# .env file
-OPENWEATHER_API_KEY=your_openweather_api_key
-```
-
-### Testing
-```bash
-npm test                    # Run test suite
-npm run test:coverage       # Generate coverage report
-npm run test:integration    # Run integration tests
-```
-
-### Building
-```bash
-npm run build              # Build for production
-npm run build:watch        # Build in watch mode
-npm run type-check         # TypeScript validation
-```
-
-## Integration Examples
-
-### AI Assistant
+### Basic Usage
 ```typescript
 import { OpenWeather2, Weather } from '@synet/weather';
-import { AI } from '@synet/ai';
 
-const weatherProvider = new OpenWeather2({
+const provider = new OpenWeather2({
   apiKey: process.env.OPENWEATHER_API_KEY,
   timeout: 10000
 });
 
 const weather = Weather.create({ 
-  provider: weatherProvider,
+  provider,
   defaultUnits: 'metric'
 });
 
-const ai = AI.create({ 
-  type: 'openai', 
-  options: { apiKey: process.env.OPENAI_API_KEY }
+// Get current weather
+const tokyo = await weather.getCurrentWeather('Tokyo');
+console.log(`${tokyo.location}: ${tokyo.temperature}°C, ${tokyo.description}`);
+
+// Get forecast
+const forecast = await weather.getForecast(35.6762, 139.6503);
+console.log(`5-day forecast for ${forecast.location}:`);
+forecast.forecasts.forEach(day => {
+  console.log(`${day.date}: ${day.high}°/${day.low}° - ${day.description}`);
 });
+```
+
+### With Events
+```typescript
+// Monitor all weather operations
+weather.on('weather.current', (event) => {
+  console.log(`Requesting weather for: ${event.data.location}`);
+});
+
+weather.on('weather.current.success', (event) => {
+  const { location, duration } = event.data;
+  console.log(`✅ Got weather for ${location} (${duration}ms)`);
+});
+
+weather.on('weather.current.error', (event) => {
+  const { location } = event.data;
+  console.log(`❌ Failed to get weather for ${location}: ${event.error.message}`);
+});
+
+// Now make requests - events will fire
+await weather.getCurrentWeather('London');
+```
+
+### AI Integration
+```typescript
+import { AI } from '@synet/ai';
+
+const ai = AI.create({ type: 'openai' });
 
 // AI learns weather capabilities
 ai.learn([weather.teach()]);
 
-// Enterprise weather intelligence
-const report = await ai.call(`
-  Analyze weather conditions for our European offices (London, Paris, Berlin) 
-  and provide operational recommendations for tomorrow's outdoor events.
+// AI can now use weather data
+const response = await ai.call(`
+  Compare the weather in London, Paris, and Tokyo. 
+  Which city has the best weather for outdoor activities today?
 `, { useTools: true });
 ```
 
 ### Multi-Provider Setup
 ```typescript
-// Development: Mock provider
-const devProvider = new MockWeather();
-
-// Staging: Free tier provider  
-const stagingProvider = new OpenWeather2({ 
-  apiKey: process.env.STAGING_API_KEY 
-});
-
-// Production: Premium provider
-const prodProvider = new WeatherAPI({ 
-  apiKey: process.env.PREMIUM_API_KEY 
-});
-
-// Environment-based provider selection
+// Environment-based provider switching
 const provider = process.env.NODE_ENV === 'production' 
-  ? prodProvider 
-  : process.env.NODE_ENV === 'staging' 
-    ? stagingProvider 
-    : devProvider;
+  ? new WeatherAPI({ apiKey: process.env.PREMIUM_API_KEY })
+  : new OpenWeather2({ apiKey: process.env.FREE_API_KEY });
 
 const weather = Weather.create({ provider });
 ```
 
 ## License
 
-MIT License - Enterprise-friendly with no restrictions on commercial usage.
+MIT
 
----
-
-*Weather Intelligence Provider - Powering the next generation of AI-driven applications*
