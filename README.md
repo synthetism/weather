@@ -11,7 +11,7 @@
        / /_/ / / / / / /_                
        \____/_/ /_/_/\__/                
                                             
-version: 1.0.2                                                                 
+version: 1.0.3                                                                 
 ```
 
 **Weather data for AI systems. Multiple providers. Built on Unit Architecture.**

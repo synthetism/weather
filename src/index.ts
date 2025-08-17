@@ -4,11 +4,15 @@
  * AI-ready weather capabilities through configurable providers.
  * Built with Unit Architecture for seamless AI integration.
  * 
- * @version 1.0.1
+ * @version 1.0.3
  */
 
 // Export main Weather unit
-export { Weather, VERSION } from './weather.unit';
+export {
+  Weather, 
+  VERSION,
+  type WeatherEvent
+} from './weather.unit';
 
 // Export providers
 export { OpenWeather2 } from './providers/openweather2';

@@ -47,7 +47,7 @@ import type {
 // WEATHER EVENT INTERFACES
 // =============================================================================
 
-interface WeatherEvent extends Event {
+export interface WeatherEvent extends Event {
   type: 'weather.current' | 'weather.forecast' | 'weather.coords';
   unitId: string;
   operation: string;
@@ -67,7 +67,7 @@ export interface WeatherProps extends UnitProps {
 // WEATHER UNIT IMPLEMENTATION
 // =============================================================================
 
-export const VERSION = '1.0.1';
+export const VERSION = '1.0.3';
 /**
  * Weather Unit - AI-Ready Weather Information Provider
  * 
