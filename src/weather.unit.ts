@@ -67,7 +67,7 @@ export interface WeatherProps extends UnitProps {
 // WEATHER UNIT IMPLEMENTATION
 // =============================================================================
 
-export const VERSION = '1.0.3';
+export const VERSION = '1.0.5';
 /**
  * Weather Unit - AI-Ready Weather Information Provider
  * 
@@ -87,15 +87,15 @@ export class Weather extends Unit<WeatherProps> {
     const capabilities = CapabilitiesClass.create(this.dna.id, {
       getCurrentWeather: (...args: unknown[]) => {
         const params = args[0] as { location: string; units?: 'metric' | 'imperial' | 'kelvin' };
-        return this.getCurrentWeather(params.location, params.units);
+        return this.getCurrentWeather(params);
       },
       getForecast: (...args: unknown[]) => {
         const params = args[0] as { latitude: number; longitude: number; units?: 'metric' | 'imperial' | 'kelvin' };
-        return this.getForecast(params.latitude, params.longitude, params.units);
+        return this.getForecast(params);
       },
       getWeatherByCoords: (...args: unknown[]) => {
         const params = args[0] as { latitude: number; longitude: number; units?: 'metric' | 'imperial' | 'kelvin' };
-        return this.getWeatherByCoords(params.latitude, params.longitude, params.units);
+        return this.getWeatherByCoords(params);
       }
     });
 
@@ -249,18 +249,18 @@ export class Weather extends Unit<WeatherProps> {
 🌤️ Weather Unit - AI-Ready Weather Information Provider
 
 Native Capabilities:
-• getCurrentWeather(location) - Get current weather for a location
-• getForecast(lat, lon) - Get weather forecast using coordinates
-• getWeatherByCoords(lat, lon) - Get weather by coordinates
+• getCurrentWeather({ location, units? }) - Get current weather for a location
+• getForecast({ latitude, longitude, units? }) - Get weather forecast using coordinates
+• getWeatherByCoords({ latitude, longitude, units? }) - Get weather by coordinates
 
 Configuration:
 • Provider: ${this.props.provider.constructor.name}
 • Default Units: ${this.props.defaultUnits}
 
 Usage Examples:
-  await weather.getCurrentWeather("Tokyo");
-  await weather.getForecast(35.6762, 139.6503);
-  await weather.getWeatherByCoords(35.6762, 139.6503);
+  await weather.getCurrentWeather({ location: "Tokyo" });
+  await weather.getForecast({ latitude: 35.6762, longitude: 139.6503 });
+  await weather.getWeatherByCoords({ latitude: 35.6762, longitude: 139.6503 });
   await weather.searchLocation("French Riviera");
   
 AI Integration:
@@ -299,7 +299,8 @@ Events:
   /**
    * Get current weather for a location
    */
-  async getCurrentWeather(location: string, units?: 'metric' | 'imperial' | 'kelvin'): Promise<WeatherData> {
+  async getCurrentWeather(params: { location: string; units?: 'metric' | 'imperial' | 'kelvin' }): Promise<WeatherData> {
+    const { location, units } = params;
     const startTime = Date.now();
     const actualUnits = units || this.props.defaultUnits;
     
@@ -351,12 +352,13 @@ Events:
   /**
    * Get weather forecast for coordinates
    */
-  async getForecast(lat: number, lon: number, units?: 'metric' | 'imperial' | 'kelvin'): Promise<ForecastData> {
+  async getForecast(params: { latitude: number; longitude: number; units?: 'metric' | 'imperial' | 'kelvin' }): Promise<ForecastData> {
+    const { latitude, longitude, units } = params;
     const startTime = Date.now();
     const actualUnits = units || this.props.defaultUnits;
     
     try {
-      const result = await this.props.provider.getForecast(lat, lon, actualUnits);
+      const result = await this.props.provider.getForecast(latitude, longitude, actualUnits);
       const duration = Date.now() - startTime;
 
       // Emit success event with result
@@ -366,8 +368,8 @@ Events:
         unitId: this.dna.id,
         operation: 'getForecast',
         data: { 
-          latitude: lat, 
-          longitude: lon, 
+          latitude, 
+          longitude, 
           units: actualUnits, 
           location: result.location,
           country: result.country,
@@ -385,7 +387,7 @@ Events:
         timestamp: new Date(),
         unitId: this.dna.id,
         operation: 'getForecast',
-        data: { latitude: lat, longitude: lon, units: actualUnits, duration },
+        data: { latitude, longitude, units: actualUnits, duration },
         error: {
           message: error instanceof Error ? error.message : String(error)
         }
@@ -398,14 +400,15 @@ Events:
   /**
    * Get weather by coordinates
    */
-  async getWeatherByCoords(lat: number, lon: number, units?: 'metric' | 'imperial' | 'kelvin'): Promise<WeatherData> {
+  async getWeatherByCoords(params: { latitude: number; longitude: number; units?: 'metric' | 'imperial' | 'kelvin' }): Promise<WeatherData> {
+    const { latitude, longitude, units } = params;
     const startTime = Date.now();
     const actualUnits = units || this.props.defaultUnits;
     
     try {
       // Emit request event
   
-      const result = await this.props.provider.getWeatherByCoords(lat, lon, actualUnits);
+      const result = await this.props.provider.getWeatherByCoords(latitude, longitude, actualUnits);
       const duration = Date.now() - startTime;
 
       // Emit success event
@@ -415,8 +418,8 @@ Events:
         unitId: this.dna.id,
         operation: 'getWeatherByCoords',
         data: { 
-          latitude: lat, 
-          longitude: lon, 
+          latitude, 
+          longitude, 
           units: actualUnits, 
           duration,
           temperature: result.temperature,
@@ -440,7 +443,7 @@ Events:
         timestamp: new Date(),
         unitId: this.dna.id,
         operation: 'getWeatherByCoords',
-        data: { latitude: lat, longitude: lon, units: actualUnits, duration },
+        data: { latitude, longitude, units: actualUnits, duration },
         error: {
           message: error instanceof Error ? error.message : String(error)
         }

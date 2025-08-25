@@ -113,7 +113,7 @@ describe('Weather Unit Events', () => {
       const handler = vi.fn();
       weather.on('weather.current', handler);
       
-      await weather.getCurrentWeather('Tokyo');
+      await weather.getCurrentWeather({ location: 'Tokyo' });
       
       expect(handler).toHaveBeenCalledOnce();
       const event = handler.mock.calls[0][0];
@@ -130,7 +130,7 @@ describe('Weather Unit Events', () => {
       errorWeather.on('weather.current', handler);
       
       try {
-        await errorWeather.getCurrentWeather('London');
+        await errorWeather.getCurrentWeather({ location: 'London' });
       } catch (error) {
         // Expected to throw
       }
@@ -152,7 +152,7 @@ describe('Weather Unit Events', () => {
       const handler = vi.fn();
       weather.on('weather.forecast', handler);
       
-      await weather.getForecast(35.6762, 139.6503);
+      await weather.getForecast({ latitude: 35.6762, longitude: 139.6503 });
       
       expect(handler).toHaveBeenCalledOnce();
       const event = handler.mock.calls[0][0];
@@ -169,7 +169,7 @@ describe('Weather Unit Events', () => {
       errorWeather.on('weather.forecast', handler);
       
       try {
-        await errorWeather.getForecast(40.7128, -74.0060);
+        await errorWeather.getForecast({ latitude: 40.7128, longitude: -74.0060 });
       } catch (error) {
         // Expected to throw
       }
@@ -186,7 +186,7 @@ describe('Weather Unit Events', () => {
       const handler = vi.fn();
       weather.on('weather.coords', handler);
       
-      await weather.getWeatherByCoords(48.8566, 2.3522);
+      await weather.getWeatherByCoords({ latitude: 48.8566, longitude: 2.3522 });
       
       expect(handler).toHaveBeenCalledOnce();
       const event = handler.mock.calls[0][0];
@@ -202,7 +202,7 @@ describe('Weather Unit Events', () => {
       errorWeather.on('weather.coords', handler);
       
       try {
-        await errorWeather.getWeatherByCoords(0, 0);
+        await errorWeather.getWeatherByCoords({ latitude: 0, longitude: 0 });
       } catch (error) {
         // Expected to throw
       }
@@ -222,7 +222,7 @@ describe('Weather Unit Events', () => {
       // Unsubscribe immediately
       unsubscribe();
       
-      await weather.getCurrentWeather('Test');
+      await weather.getCurrentWeather({ location: 'Test' });
       
       // Handler should not have been called
       expect(handler).not.toHaveBeenCalled();
@@ -233,8 +233,8 @@ describe('Weather Unit Events', () => {
       weather.once('weather.current', handler);
       
       // Make two requests
-      await weather.getCurrentWeather('Test1');
-      await weather.getCurrentWeather('Test2');
+      await weather.getCurrentWeather({ location: 'Test1' });
+      await weather.getCurrentWeather({ location: 'Test2' });
       
       // Handler should only be called once
       expect(handler).toHaveBeenCalledOnce();
@@ -250,7 +250,7 @@ describe('Weather Unit Events', () => {
       // Remove all handlers for this event type
       weather.off('weather.current');
       
-      await weather.getCurrentWeather('Test');
+      await weather.getCurrentWeather({ location: 'Test' });
       
       // No handlers should be called
       expect(handler1).not.toHaveBeenCalled();
@@ -263,7 +263,7 @@ describe('Weather Unit Events', () => {
       const handler = vi.fn();
       weather.on('weather.current', handler);
       
-      await weather.getCurrentWeather('Berlin', 'imperial');
+      await weather.getCurrentWeather({ location: 'Berlin', units: 'imperial' });
       
       const event = handler.mock.calls[0][0];
       
@@ -284,7 +284,7 @@ describe('Weather Unit Events', () => {
       const handler = vi.fn();
       weather.on('weather.forecast', handler);
       
-      await weather.getForecast(35.6762, 139.6503, 'kelvin');
+      await weather.getForecast({ latitude: 35.6762, longitude: 139.6503, units: 'kelvin' });
       
       const event = handler.mock.calls[0][0];
       expect(event.data.units).toBe('kelvin');
@@ -294,7 +294,7 @@ describe('Weather Unit Events', () => {
       const handler = vi.fn();
       weather.on('weather.coords', handler);
       
-      await weather.getWeatherByCoords(48.8566, 2.3522);
+      await weather.getWeatherByCoords({ latitude: 48.8566, longitude: 2.3522 });
       
       const event = handler.mock.calls[0][0];
       expect(event.data.units).toBe('metric'); // Default from weather unit

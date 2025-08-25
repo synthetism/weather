@@ -117,19 +117,19 @@ describe('Weather Unit', () => {
 
   describe('Weather Operations', () => {
     it('should delegate getCurrentWeather to provider', async () => {
-      const result = await weather.getCurrentWeather('London');
+      const result = await weather.getCurrentWeather({ location: 'London' });
       expect(result).toHaveProperty('location', 'Test City');
       expect(result).toHaveProperty('temperature', 20);
     });
 
     it('should delegate getForecast to provider', async () => {
-      const result = await weather.getForecast(51.5074, -0.1278);
+      const result = await weather.getForecast({ latitude: 51.5074, longitude: -0.1278 });
       expect(result).toHaveProperty('location', 'Test City');
       expect(result.forecasts).toHaveLength(1);
     });
 
     it('should delegate getWeatherByCoords to provider', async () => {
-      const result = await weather.getWeatherByCoords(51.5074, -0.1278);
+      const result = await weather.getWeatherByCoords({ latitude: 51.5074, longitude: -0.1278 });
       expect(result).toHaveProperty('location', 'Test City');
     });
 

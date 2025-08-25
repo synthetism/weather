@@ -80,7 +80,7 @@ async function main() {
     try {
       // Test current weather
       console.log('1. Current weather in Tokyo:');
-      const current = await weather.getCurrentWeather('Tokyo');
+      const current = await weather.getCurrentWeather({ location: 'Tokyo' });
       console.log(`   📍 ${current.location}, ${current.country}`);
       console.log(`   🌡️  ${current.temperature}°C (feels like ${current.feelsLike}°C)`);
       console.log(`   ☁️  ${current.description}`);
@@ -88,7 +88,7 @@ async function main() {
 
       // Test forecast
       console.log('2. 3-day forecast for London (51.5074, -0.1278):');
-      const forecast = await weather.getForecast(51.5074, -0.1278);
+      const forecast = await weather.getForecast({ latitude: 51.5074, longitude: -0.1278 });
       forecast.forecasts.forEach(day => {
         console.log(`   ${day.date}: ${day.high}°/${day.low}°C - ${day.description}`);
       });
@@ -96,15 +96,9 @@ async function main() {
 
       // Test coordinates
       console.log('3. Weather by coordinates (NYC):');
-      const coordWeather = await weather.getWeatherByCoords(40.7128, -74.0060);
+      const coordWeather = await weather.getWeatherByCoords({ latitude: 40.7128, longitude: -74.0060 });
       console.log(`   📍 ${coordWeather.location}: ${coordWeather.temperature}°C - ${coordWeather.description}\n`);
 
-      // Test location search
-      console.log('4. Location search for "Paris":');
-      const locations = await weather.searchLocation('Paris');
-      locations.slice(0, 3).forEach(loc => {
-        console.log(`   ${loc.name}, ${loc.country} (${loc.lat}, ${loc.lon})`);
-      });
       
     } catch (error) {
       console.error('❌ Error during live testing:', error instanceof Error ? error.message : error);
@@ -112,10 +106,9 @@ async function main() {
   } else {
     console.log('🔧 Demo mode - showing interface without live API calls\n');
     console.log('Available methods:');
-    console.log('  • await weather.getCurrentWeather("Tokyo")');
-    console.log('  • await weather.getForecast(51.5074, -0.1278)');
-    console.log('  • await weather.getWeatherByCoords(40.7128, -74.0060)');
-    console.log('  • await weather.searchLocation("Paris")');
+    console.log('  • await weather.getCurrentWeather({ location: "Tokyo" })');
+    console.log('  • await weather.getForecast({ latitude: 51.5074, longitude: -0.1278 })');
+    console.log('  • await weather.getWeatherByCoords({ latitude: 40.7128, longitude: -74.0060 })');
   }
 
   console.log('\n🎉 Demo completed successfully!');

@@ -11,7 +11,7 @@
        / /_/ / / / / / /_                
        \____/_/ /_/_/\__/                
                                             
-version: 1.0.3                                                                 
+version: 1.0.5   
 ```
 
 **Weather data for AI systems. Multiple providers. Built on Unit Architecture.**
@@ -47,9 +47,9 @@ const weather = Weather.create({
 });
 
 // Get weather data
-const current = await weather.getCurrentWeather('Tokyo');
-const forecast = await weather.getForecast(35.6762, 139.6503);
-const coords = await weather.getWeatherByCoords(35.6762, 139.6503);
+const current = await weather.getCurrentWeather({ location: 'Tokyo' });
+const forecast = await weather.getForecast({ latitude: 35.6762, longitude: 139.6503 });
+const coords = await weather.getWeatherByCoords({ latitude: 35.6762, longitude: 139.6503 });
 
 // For AI systems
 const ai = AI.create({ type: 'openai' });
@@ -87,9 +87,9 @@ All weather providers implement the same interface. Switch providers without cha
 ```typescript
 // Universal interface
 interface IWeather {
-  getCurrentWeather(location: string, units?: string): Promise<WeatherData>;
-  getForecast(lat: number, lon: number, units?: string): Promise<ForecastData>;
-  getWeatherByCoords(lat: number, lon: number, units?: string): Promise<WeatherData>;
+  getCurrentWeather(params: { location: string; units?: string }): Promise<WeatherData>;
+  getForecast(params: { latitude: number; longitude: number; units?: string }): Promise<ForecastData>;
+  getWeatherByCoords(params: { latitude: number; longitude: number; units?: string }): Promise<WeatherData>;
   validateConnection(): Promise<boolean>;
 }
 
@@ -108,7 +108,7 @@ The weather unit can teach its capabilities to AI systems:
 
 ```typescript
 // Weather unit methods
-weather.getCurrentWeather('Tokyo')     // Direct usage
+weather.getCurrentWeather({ location: 'Tokyo' })     // Direct usage
 weather.teach()                        // Share capabilities with AI
 weather.capabilities()                 // List available methods
 weather.on('weather.current', handler) // Monitor operations
@@ -123,9 +123,9 @@ weather.on('weather.current', handler) // Monitor operations
 Weather.create(config: WeatherConfig): Weather
 
 // Get weather data
-getCurrentWeather(location: string, units?: string): Promise<WeatherData>
-getForecast(lat: number, lon: number, units?: string): Promise<ForecastData>  
-getWeatherByCoords(lat: number, lon: number, units?: string): Promise<WeatherData>
+getCurrentWeather(params: { location: string; units?: string }): Promise<WeatherData>
+getForecast(params: { latitude: number; longitude: number; units?: string }): Promise<ForecastData>  
+getWeatherByCoords(params: { latitude: number; longitude: number; units?: string }): Promise<WeatherData>
 
 // Unit Architecture methods
 teach(): TeachingContract        // Share capabilities with AI
@@ -200,11 +200,11 @@ const weather = Weather.create({
 });
 
 // Get current weather
-const tokyo = await weather.getCurrentWeather('Tokyo');
+const tokyo = await weather.getCurrentWeather({ location: 'Tokyo' });
 console.log(`${tokyo.location}: ${tokyo.temperature}°C, ${tokyo.description}`);
 
 // Get forecast
-const forecast = await weather.getForecast(35.6762, 139.6503);
+const forecast = await weather.getForecast({ latitude: 35.6762, longitude: 139.6503 });
 console.log(`5-day forecast for ${forecast.location}:`);
 forecast.forecasts.forEach(day => {
   console.log(`${day.date}: ${day.high}°/${day.low}° - ${day.description}`);
@@ -229,7 +229,7 @@ weather.on('weather.current.error', (event) => {
 });
 
 // Now make requests - events will fire
-await weather.getCurrentWeather('London');
+await weather.getCurrentWeather({ location: 'London' });
 ```
 
 ### AI Integration
